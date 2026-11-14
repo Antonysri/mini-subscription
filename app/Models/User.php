@@ -8,20 +8,20 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-// Oru user-ku niraiya records iruntha HasMany use panrom (eg: multiple payments)
+// Eloquent Relationships
 use Illuminate\Database\Eloquent\Relations\HasMany;
-
-// Oru user-ku ore oru record mattum filter panni edukka HasOne use panrom (eg: currently active subscription)
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class User extends Authenticatable
+// 🌟 JWT CONTRACT: Intha interface-ah implement panna thaan JWT package namma User-ah identify pannum
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
+
+class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
     /**
      * MASS ASSIGNMENT PROTECTION:
-     * User register aagum pothu intha 3 fields mattum thaan client side-la irunthu allow aagum.
      */
     protected $fillable = [
         'name',
@@ -31,8 +31,6 @@ class User extends Authenticatable
 
     /**
      * HIDDEN ATTRIBUTES:
-     * User details API JSON response-ah veliya pogum pothu
-     * password hash-um remember_token-um veliya theriyaama hide pannidum.
      */
     protected $hidden = [
         'password',
@@ -46,54 +44,48 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed', // Password create aagum bothey automatic-ah bcrypt hash aagidum
+            'password' => 'hashed',
         ];
     }
 
     /**
-     * RELATIONSHIP 1: Oru user-ku niraiya payments irukalam (HasMany Payments)
-     * 
-     * Example:
-     * $user = auth()->user();
-     * foreach ($user->payments as $payment) {
-     *     echo $payment->amount; // User panna ella payments list-um edukalam (Payment History API)
-     * }
+     * 🌟 JWT METHOD 1: Unique Identifier
+     * Token-kulla user-oda entha ID-ah store pannanum nu solla.
+     * $this->getKey() namma user-oda 'id' (Primary key)-ah return pannum.
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * 🌟 JWT METHOD 2: Custom Claims
+     * Token payload-kulla extra-va ethavathu data poodanuma nu solla.
+     * Standard-ah empty array [] thara vendiyathu thaan.
+     */
+    public function getJWTCustomClaims(): array
+    {
+        return [];
+    }
+
+    /**
+     * RELATIONSHIP 1: User panna payments (HasMany)
      */
     public function payments(): HasMany
     {
-        // payments table-la irukura 'user_id' column-ah vachu map pannum
         return $this->hasMany(Payment::class);
     }
 
     /**
-     * RELATIONSHIP 2: Oru user-ku niraiya subscriptions (pazhayathu + puthusu) irukalam (HasMany Subscriptions)
-     * 
-     * Example:
-     * $user = auth()->user();
-     * echo $user->subscriptions()->count(); // Intha user total-ah ethana thadava subscribe pannirukaru nu paக்கலாம்
+     * RELATIONSHIP 2: User-oda total subscriptions (HasMany)
      */
     public function subscriptions(): HasMany
     {
-        // subscriptions table-la irukura 'user_id' column-ah vachu map pannum
         return $this->hasMany(Subscription::class);
     }
 
     /**
-     * RELATIONSHIP 3: Oru user-ku CURRENT-AH ACTIVE-AH IRUKURA subscription mattum eduka (HasOne Active Subscription)
-     * 
-     * Ithu romba smart-ana relationship:
-     * 1. status 'active'-ah irukanum
-     * 2. expires_at innum mudiyama irukanum (> now())
-     * 3. latestOfMany() moolama kadasia vangunatha mattum edukkum
-     * 
-     * Example:
-     * $user = auth()->user();
-     * if ($user->activeSubscription) {
-     *     echo "Welcome! Your plan: " . $user->activeSubscription->plan->name;
-     *     echo "Days left: " . $user->activeSubscription->days_remaining;
-     * } else {
-     *     echo "No active subscription. Please upgrade!";
-     * }
+     * RELATIONSHIP 3: User-oda Current Active Subscription (HasOne)
      */
     public function activeSubscription(): HasOne
     {

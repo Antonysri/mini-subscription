@@ -42,6 +42,12 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        // 🌟 JWT API GUARD:
+        // API routes-ku 'auth:api' middleware podum pothu JWT driver use panna solrom
+        'api' => [
+            'driver' => 'jwt',
+            'provider' => 'users',
+        ],
     ],
 
     /*

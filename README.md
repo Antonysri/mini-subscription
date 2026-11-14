@@ -30,7 +30,7 @@ A production-grade **Mini Subscription Management System** built with **PHP 8.3+
 
 - [x] Issue #1: Environment & Tooling Setup (PHP 8.3+, Composer, Redis, Laravel 13)
 - [x] Issue #2: Database Architecture, Migrations & Plan Seeders
-- [ ] Issue #3: JWT Authentication System (Register, Login, Me, Logout)
+- [x] Issue #3: JWT Authentication System (Register, Login, Me, Logout)
 - [ ] Issue #4: Redis Caching for Subscription Plans
 - [ ] Issue #5: Stripe Checkout Session Creation
 - [ ] Issue #6: Stripe Webhooks & Subscription Activation
