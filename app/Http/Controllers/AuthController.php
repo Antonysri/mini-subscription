@@ -55,7 +55,7 @@ class AuthController extends Controller
         if (! $token = auth('api')->attempt($credentials)) {
             return $this->errorResponse('Invalid email or password', 401);
         }
-
+        
         return $this->respondWithToken($token, 'Login successful', 200);
     }
 

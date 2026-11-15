@@ -2,8 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
-// Namma AuthController-ah import panrom
+// Controllers import panrom
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PlanController; // 👈 1. PlanController-ah import panrom
 
 /**
  * 🔓 PUBLIC ROUTES:
@@ -12,6 +13,11 @@ use App\Http\Controllers\AuthController;
  */
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
+// 🌟 GET ALL PLANS (Redis Cached):
+// Express equivalent: app.get('/api/plans', planController.index);
+Route::get('/plans', [PlanController::class, 'index']); // 👈 2. Intha route-ah add panrom
+
 
 /**
  * 🔒 PROTECTED ROUTES (JWT Middleware):
