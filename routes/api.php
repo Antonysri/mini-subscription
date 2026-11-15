@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PlanController; // 👈 1. PlanController-ah import panrom
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\StripeWebhookController;
 /**
  * 🔓 PUBLIC ROUTES:
  * Yar vena access pannalam (Token thevailla).
@@ -18,7 +19,10 @@ Route::post('/login', [AuthController::class, 'login']);
 // Express equivalent: app.get('/api/plans', planController.index);
 Route::get('/plans', [PlanController::class, 'index']); // 👈 2. Intha route-ah add panrom
 
-
+// 🌟 STRIPE WEBHOOK LISTENER (POST /api/stripe/webhook):
+// Stripe server events anupa intha route use aagum.
+// JWT token theva illa, 'Stripe-Signature' HMAC hash verify aagum!
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook']);
 /**
  * 🔒 PROTECTED ROUTES (JWT Middleware):
  * Intha routes-ku request anupum pothu kandippa Header-la:
