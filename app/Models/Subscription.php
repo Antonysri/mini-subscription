@@ -67,12 +67,12 @@ class Subscription extends Model
             return 0; // Already mudinjiduchu na 0 days
         }
 
-        // Current time-kum expires_at-kum nadula irukura days difference
-        return (int) now()->diffInDays($this->expires_at, false);
+        // Current time-kum expires_at-kum nadula irukura days difference (ceil for accurate remaining calendar days):
+        return (int) ceil(now()->floatDiffInDays($this->expires_at, false));
     }
 
     /**
-     * RELATIONSHIP 1: Intha subscription entha user-ku சொந்தமானது? (BelongsTo User)
+     * RELATIONSHIP 1: Intha subscription entha user-ku sonthamaanathu? (BelongsTo User)
      * 
      * Example:
      * $sub = Subscription::find(1);
@@ -86,7 +86,7 @@ class Subscription extends Model
     }
 
     /**
-     * RELATIONSHIP 2: Intha subscription entha plan-oda சேர்ந்தது? (BelongsTo Plan)
+     * RELATIONSHIP 2: Intha subscription entha plan-oda sernthathu? (BelongsTo Plan)
      * 
      * Example:
      * $sub = Subscription::find(1);
@@ -100,7 +100,7 @@ class Subscription extends Model
     }
 
     /**
-     * RELATIONSHIP 3: Intha subscription-kaga kattiya payment details என்ன? (BelongsTo Payment)
+     * RELATIONSHIP 3: Intha subscription-kaga kattiya payment details enna? (BelongsTo Payment)
      * 
      * Example:
      * $sub = Subscription::find(1);

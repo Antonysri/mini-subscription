@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PlanController; // 👈 1. PlanController-ah import panrom
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\StripeWebhookController;
+use App\Http\Controllers\BillingController;
 /**
  * 🔓 PUBLIC ROUTES:
  * Yar vena access pannalam (Token thevailla).
@@ -37,4 +38,10 @@ Route::middleware('auth:api')->group(function () {
     // 🌟 STRIPE CHECKOUT ROUTE (POST /api/checkout):
     // Login panna user mattum thaan subscription buy panna checkout URL generate panna mudiyum.
     Route::post('/checkout', [CheckoutController::class, 'checkout']);
+
+    // 🌟 ACTIVE SUBSCRIPTION & PAYMENT HISTORY (Phase 7):
+    Route::get('/me/subscription', [BillingController::class, 'subscription']);
+    Route::get('/subscription', [BillingController::class, 'subscription']); // Shortcut alias
+    Route::get('/me/payments', [BillingController::class, 'payments']);
+    Route::get('/payments', [BillingController::class, 'payments']); // Shortcut alias
 });
