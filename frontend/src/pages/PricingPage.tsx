@@ -94,8 +94,9 @@ export const PricingPage: React.FC = () => {
       setLoadingPlanId(planId);
       setCheckoutError(null);
       const response = await billingApi.createCheckout(planId);
-      if (response.checkout_url) {
-        window.location.href = response.checkout_url;
+      const redirectUrl = response.data?.checkout_url || (response as unknown as { checkout_url?: string }).checkout_url;
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
       }
     } catch (err: unknown) {
       const errorMsg =

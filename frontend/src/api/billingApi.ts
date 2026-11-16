@@ -1,9 +1,19 @@
 import axiosClient from './axiosClient';
 import { Subscription, PaginatedPayments } from '../types';
 
+export interface CheckoutResponse {
+  success: boolean;
+  message: string;
+  data: {
+    checkout_url: string;
+    session_id: string;
+    payment_id: number;
+  };
+}
+
 export const billingApi = {
-  createCheckout: async (plan_id: number): Promise<{ success: boolean; checkout_url: string; session_id: string }> => {
-    const response = await axiosClient.post<{ success: boolean; checkout_url: string; session_id: string }>('/checkout', {
+  createCheckout: async (plan_id: number): Promise<CheckoutResponse> => {
+    const response = await axiosClient.post<CheckoutResponse>('/checkout', {
       plan_id,
     });
     return response.data;
