@@ -30,13 +30,15 @@ export const PricingPage: React.FC = () => {
     staleTime: 1000 * 60 * 5, // 5 min cache
   });
 
-  // Fallback / enriched display mapping matching pricing_template.png
+  // Dynamically map backend plans with the mockup styling & feature lists
+  const backendPlans = plansData?.data || [];
+  
   const tiers: PricingTier[] = [
     {
-      id: plansData?.data?.[0]?.id || 1,
-      name: 'Personal',
+      id: backendPlans[0]?.id || 1,
+      name: backendPlans[0]?.name || 'Personal',
       price: '$49',
-      monthlyPrice: '$9',
+      monthlyPrice: `$${backendPlans[0] ? Math.round(Number(backendPlans[0].price)) : 9}`,
       features: [
         '1 GB SSD Storage',
         '50 GB Data Transfer',
@@ -49,10 +51,10 @@ export const PricingPage: React.FC = () => {
       ],
     },
     {
-      id: plansData?.data?.[1]?.id || 2,
-      name: 'Startup',
+      id: backendPlans[1]?.id || 2,
+      name: backendPlans[1]?.name || 'Startup',
       price: '$69',
-      monthlyPrice: '$19',
+      monthlyPrice: `$${backendPlans[1] ? Math.round(Number(backendPlans[1].price)) : 29}`,
       isPopular: true,
       features: [
         '5 GB SSD Storage',
@@ -66,10 +68,10 @@ export const PricingPage: React.FC = () => {
       ],
     },
     {
-      id: plansData?.data?.[2]?.id || 3,
-      name: 'Corporate',
+      id: backendPlans[2]?.id || 3,
+      name: backendPlans[2]?.name || 'Corporate',
       price: '$99',
-      monthlyPrice: '$29',
+      monthlyPrice: `$${backendPlans[2] ? Math.round(Number(backendPlans[2].price)) : 99}`,
       features: [
         '10 GB SSD Storage',
         '500 GB Data Transfer',
