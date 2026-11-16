@@ -21,7 +21,8 @@ A production-grade, enterprise **Mini Subscription Management System** built wit
 
 ## 🛠️ Tech Stack
 
-- **Framework**: Laravel 13 (PHP 8.3+)
+- **Backend Framework**: Laravel 13 (PHP 8.3+)
+- **Frontend SPA**: React 18, Vite, TypeScript, Tailwind CSS, TanStack Query v5, Redux Toolkit
 - **Database**: MySQL 8.x
 - **Cache & Key-Value Store**: Redis
 - **Auth Provider**: JSON Web Tokens (`php-open-source-saver/jwt-auth`)
@@ -41,7 +42,8 @@ A production-grade, enterprise **Mini Subscription Management System** built wit
 - [x] **Issue #6**: Stripe Webhooks & Idempotent Subscription Activation (HMAC & Row Locking)
 - [x] **Issue #7**: Active Subscription Status & Paginated Payment History APIs
 - [x] **Issue #8**: Security Hardening, Tiered Rate Limiting & Postman Suite
-- [ ] **Issue #9**: Free Cloud Deployment & Public Tunneling (Ngrok / Cloudflare Tunnel, Stripe Live Testing)
+- [x] **Issue #10**: Modern React + Vite + TypeScript Frontend SPA (Pricing, Auth, Dashboard & Customer Portal)
+- [ ] **Issue #9**: Production Dockerization, GitHub Actions CI/CD Pipeline & Live Cloud Tunneling
 
 ---
 
