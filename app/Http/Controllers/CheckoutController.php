@@ -62,13 +62,14 @@ class CheckoutController extends Controller
         // Calculation: $29.00 * 100 = 2900 cents.
         $unitAmountInCents = (int) round($plan->price * 100);
 
+        $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+
         // 4. Stripe Hosted Checkout Session Creation:
+        // Notice: Modern 2026 Stripe uses Dynamic Payment Methods configured in Stripe Dashboard.
+        // Explicit 'payment_method_types' is deprecated and removed!
         $session = $this->stripe->checkout->sessions->create([
             // 'payment' mode for one-time fixed period charges:
             'mode' => 'payment',
-
-            // Card payment method support:
-            'payment_method_types' => ['card'],
 
             // User Stripe page open pannumpothu avanga email automatic-ah pre-fill aagidum:
             'customer_email' => $user->email,
@@ -97,11 +98,11 @@ class CheckoutController extends Controller
                 'plan_id' => (string) $plan->id,
             ],
 
-            // User payment success aana redirect aaga vendiya URL (with dynamic session id):
-            'success_url' => config('app.url') . '/checkout/success?session_id={CHECKOUT_SESSION_ID}',
+            // User payment success aana redirect aaga vendiya URL (frontend dashboard):
+            'success_url' => $frontendUrl . '/dashboard?session_id={CHECKOUT_SESSION_ID}',
 
-            // User cancel click pannina return aaga vendiya URL:
-            'cancel_url' => config('app.url') . '/checkout/cancel',
+            // User cancel click pannina return aaga vendiya URL (frontend pricing):
+            'cancel_url' => $frontendUrl . '/plans',
         ]);
 
         // 5. Audit Trail: Payment table-la 'pending' nu record insert panrom:
