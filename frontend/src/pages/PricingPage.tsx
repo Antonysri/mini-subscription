@@ -10,35 +10,34 @@ interface PricingTier {
   id: number;
   name: string;
   price: string;
-  monthlyPrice: string;
+  durationDays: number;
   isPopular?: boolean;
   features: string[];
 }
 
 export const PricingPage: React.FC = () => {
-  const [billingCycle, setBillingCycle] = useState<'yearly' | 'monthly'>('yearly');
   const [loadingPlanId, setLoadingPlanId] = useState<number | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   const { isAuthenticated } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
 
-  // Fetch cached plans from backend API using TanStack Query
+  // Fetch cached plans directly from backend API via TanStack Query
   const { data: plansData, isLoading } = useQuery({
     queryKey: ['plans'],
     queryFn: planApi.getPlans,
     staleTime: 1000 * 60 * 5, // 5 min cache
   });
 
-  // Dynamically map backend plans with the mockup styling & feature lists
   const backendPlans = plansData?.data || [];
-  
+
+  // Match exact backend prices ($9, $29, $99) and 30-day monthly validity
   const tiers: PricingTier[] = [
     {
       id: backendPlans[0]?.id || 1,
-      name: backendPlans[0]?.name || 'Personal',
-      price: '$49',
-      monthlyPrice: `$${backendPlans[0] ? Math.round(Number(backendPlans[0].price)) : 9}`,
+      name: backendPlans[0]?.name || 'Starter',
+      price: `$${backendPlans[0] ? Math.round(Number(backendPlans[0].price)) : 9}`,
+      durationDays: backendPlans[0]?.duration_in_days || 30,
       features: [
         '1 GB SSD Storage',
         '50 GB Data Transfer',
@@ -52,9 +51,9 @@ export const PricingPage: React.FC = () => {
     },
     {
       id: backendPlans[1]?.id || 2,
-      name: backendPlans[1]?.name || 'Startup',
-      price: '$69',
-      monthlyPrice: `$${backendPlans[1] ? Math.round(Number(backendPlans[1].price)) : 29}`,
+      name: backendPlans[1]?.name || 'Professional',
+      price: `$${backendPlans[1] ? Math.round(Number(backendPlans[1].price)) : 29}`,
+      durationDays: backendPlans[1]?.duration_in_days || 30,
       isPopular: true,
       features: [
         '5 GB SSD Storage',
@@ -69,9 +68,9 @@ export const PricingPage: React.FC = () => {
     },
     {
       id: backendPlans[2]?.id || 3,
-      name: backendPlans[2]?.name || 'Corporate',
-      price: '$99',
-      monthlyPrice: `$${backendPlans[2] ? Math.round(Number(backendPlans[2].price)) : 99}`,
+      name: backendPlans[2]?.name || 'Business',
+      price: `$${backendPlans[2] ? Math.round(Number(backendPlans[2].price)) : 99}`,
+      durationDays: backendPlans[2]?.duration_in_days || 30,
       features: [
         '10 GB SSD Storage',
         '500 GB Data Transfer',
@@ -87,7 +86,6 @@ export const PricingPage: React.FC = () => {
 
   const handleBuyNow = async (planId: number) => {
     if (!isAuthenticated) {
-      // Redirect to login if unauthenticated
       navigate('/login', { state: { returnTo: '/plans', planId } });
       return;
     }
@@ -120,31 +118,8 @@ export const PricingPage: React.FC = () => {
         <p className="mt-3 text-sm sm:text-base text-slate-500 font-medium">
           Choose a best plan for you and your organization
         </p>
-
-        {/* Toggle Pill Switch */}
-        <div className="mt-6 inline-flex p-1 bg-slate-100/90 rounded-xl border border-slate-200">
-          <button
-            type="button"
-            onClick={() => setBillingCycle('yearly')}
-            className={`px-5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
-              billingCycle === 'yearly'
-                ? 'bg-white text-slate-800 shadow-sm'
-                : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            Yearly Plan
-          </button>
-          <button
-            type="button"
-            onClick={() => setBillingCycle('monthly')}
-            className={`px-5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
-              billingCycle === 'monthly'
-                ? 'bg-white text-slate-800 shadow-sm'
-                : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            Monthly Plan
-          </button>
+        <div className="mt-4 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-brand-purple/10 text-brand-purple font-bold text-xs uppercase tracking-wider">
+          Monthly Subscription • 30 Days Validity
         </div>
       </div>
 
@@ -158,11 +133,9 @@ export const PricingPage: React.FC = () => {
       <div className="mt-12 max-w-6xl w-full grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
         {tiers.map((tier) => {
           const isFeatured = tier.isPopular;
-          const displayPrice = billingCycle === 'yearly' ? tier.price : tier.monthlyPrice;
-          const cycleLabel = billingCycle === 'yearly' ? 'Yearly Plan' : 'Monthly Plan';
 
           if (isFeatured) {
-            // 🌟 FEATURED STARTUP CARD (Vibrant Purple + Asymmetric bottom-right curve + Yellow POPULAR badge)
+            // 🌟 FEATURED PROFESSIONAL CARD (Vibrant Purple + Asymmetric bottom-right curve + Yellow POPULAR badge)
             return (
               <div
                 key={tier.name}
@@ -180,12 +153,12 @@ export const PricingPage: React.FC = () => {
                     {tier.name}
                   </h3>
                   <p className="text-xs font-medium text-purple-200 mt-1">
-                    {cycleLabel}
+                    Monthly Plan ({tier.durationDays} Days)
                   </p>
 
                   <div className="my-6">
                     <span className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
-                      {displayPrice}
+                      {tier.price}
                     </span>
                   </div>
 
@@ -220,7 +193,7 @@ export const PricingPage: React.FC = () => {
             );
           }
 
-          // 🌟 REGULAR CARD (Personal & Corporate: White background, purple text, outline button)
+          // 🌟 REGULAR CARDS (Starter & Business: White background, purple text, outline button)
           return (
             <div
               key={tier.name}
@@ -231,12 +204,12 @@ export const PricingPage: React.FC = () => {
                   {tier.name}
                 </h3>
                 <p className="text-xs font-medium text-slate-400 mt-1">
-                  {cycleLabel}
+                  Monthly Plan ({tier.durationDays} Days)
                 </p>
 
                 <div className="my-6">
                   <span className="text-4xl sm:text-5xl font-extrabold text-brand-purple tracking-tight">
-                    {displayPrice}
+                    {tier.price}
                   </span>
                 </div>
 
