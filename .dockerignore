@@ -1,0 +1,39 @@
+# ==============================================================================
+# .dockerignore: Docker Build Context Optimization Filter
+# 
+# ❓ INTHA FILE ENNA PANNUTHU?
+# Docker image build aagum pothu, entha entha files/folders-ah 
+# container kulla copy panna KOODATHU nu Docker daemon kitta solrathu.
+# Ithu namma build time-ah 5 nimishathula irunthu 30 seconds-ah kuraikkum!
+# ==============================================================================
+
+# 1. Local Dependencies (Container kulla fresh-ah install panna porom):
+/vendor
+/node_modules
+/frontend/node_modules
+/frontend/dist
+
+# 2. Git History & Version Control (Production image-ku git file thevailla):
+.git
+.gitignore
+.gitattributes
+
+# 3. Local Environment & Secret Files (Secrets leak aagama irukka):
+.env
+.env.backup
+.env.production
+.env.local
+
+# 4. Storage Logs & Framework Cache (Empty directories container kulla auto-create aagum):
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*.log
+
+# 5. Testing Caches & IDE Files:
+.phpunit.cache
+.phpunit.result.cache
+.vscode/
+.idea/
+*.md
+pricing_template.png

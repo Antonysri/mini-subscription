@@ -1,0 +1,86 @@
+# ==============================================================================
+# Docker Compose: Full-Stack Multi-Container Orchestration
+# 
+# ❓ INTHA FILE ENNA PANNUTHU?
+# 3 Individual Containers-ah (App + MySQL + Redis) onna link panni,
+# shared virtual network-la ore click-la start pannum!
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. APPLICATION SERVICE (Laravel 13 API + React 18 SPA via Nginx)
+  # ----------------------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mini_sub_app
+    restart: unless-stopped
+    # Host machine Port 8000-ah Container Nginx Port 80-oda map panrom:
+    ports:
+      - "8000:80"
+    env_file:
+      - .env.docker
+    # MySQL 100% ready aana pinnaadi thaan app boot aaganum:
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - mini_sub_network
+
+  # ----------------------------------------------------------------------------
+  # 2. DATABASE SERVICE (MySQL 8.0)
+  # ----------------------------------------------------------------------------
+  mysql:
+    image: mysql:8.0
+    container_name: mini_sub_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: mini_subscription
+      MYSQL_ROOT_PASSWORD: secret_db_pass
+    # Local laptop port 3306-oda clash aagama irukka, container 3306-ah host 3307-ku map panrom:
+    ports:
+      - "3307:3306"
+    # Persistent Volume: Containers delete aanaalum database data permanent-ah save aagum:
+    volumes:
+      - mysql_data:/var/lib/mysql
+    # Healthcheck: Database connection ping panni readiness verify pannum:
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-psecret_db_pass"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - mini_sub_network
+
+  # ----------------------------------------------------------------------------
+  # 3. CACHE SERVICE (Redis 7 Alpine)
+  # ----------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: mini_sub_redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - mini_sub_network
+
+# ------------------------------------------------------------------------------
+# VOLUMES: Persistent Hard-Disk Storage
+# ------------------------------------------------------------------------------
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+
+# ------------------------------------------------------------------------------
+# NETWORKS: Isolated Virtual Bridge for Inter-Container Communication
+# ------------------------------------------------------------------------------
+networks:
+  mini_sub_network:
+    driver: bridge
