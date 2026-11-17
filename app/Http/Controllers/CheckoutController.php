@@ -62,7 +62,8 @@ class CheckoutController extends Controller
         // Calculation: $29.00 * 100 = 2900 cents.
         $unitAmountInCents = (int) round($plan->price * 100);
 
-        $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+        // Dynamic Frontend Redirect URL (Works on Localhost AND Live Cloud):
+        $frontendUrl = rtrim(env('FRONTEND_URL') ?: $request->header('Origin') ?: $request->getSchemeAndHttpHost(), '/');
 
         // 4. Stripe Hosted Checkout Session Creation:
         // Notice: Modern 2026 Stripe uses Dynamic Payment Methods configured in Stripe Dashboard.
