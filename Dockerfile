@@ -34,6 +34,7 @@ RUN apk add --no-cache \
     supervisor \
     curl \
     git \
+    ca-certificates \
     libpng-dev \
     libxml2-dev \
     zip \
